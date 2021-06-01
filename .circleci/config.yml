@@ -1,0 +1,47 @@
+# .circleci/config.yml
+version: 2.1
+
+executors:
+  admin-docker:
+    docker:
+      - image: circleci/node:12
+    resource_class: xlarge
+
+commands:
+  project-setup:
+    steps:
+      - add_ssh_keys:
+          fingerprints: 
+            - "87:8f:b1:d9:0a:90:05:3d:4e:99:18:67:9c:2e:11:03"
+      - run: mkdir -p ~/.ssh
+      - run: ssh-keyscan -H 178.128.80.11 >> ~/.ssh/known_hosts
+      - run: ssh -i ~/.ssh/id_rsa kyle@178.128.80.11
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run: yarn
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: mkdir -p ~/.ssh
+      - run: echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDA6dhgjTcFKa/8DUlue5p0khk1YbY2RMntjcn587dkdidKxfuuwmOevtianlKxhR0N2BLKOT/etYhHDwjao3gttJNqNLFcu1b0BJMoRBjpYefDfKDT6jRSZpPohh1cyYsVR0aBsNU+upMg0XaWSShCoU/EzDdbAo1tAwGoZKM0HCWEarueMxJ0ky9agoyLm9ELazXj3JnC69Zxe2LJ0RnrfiwXVvk8J6AIuvRFcZbZK4mM7Yw5lUMloXSB5/IeB2BVOvnDds/JlkHhEZH6N+WSUg3yzPiVVLdMmSrsKQGTLYYaB6AMIMrn/gIe25Kpv0W7RKc7A3uL3MJxYvOm3DyMCWzd/RuH7nirwGwzZAbRvAokxzkrNFoto2ejmyZ3Ttm5672CiOrk6slz6SUznfGgHKiExDCF7689ZAUL2RwfgBYrZAWKd8eyEIQhPVjtapYpxVV0ws9OthLLDIGaK2dvLrtNN11ggohb81SlmnUH8OD9qmpoa8OtNCKeE/SJMpM= root@nodejs-s-1vcpu-1gb-sgp1-01' >> ~/.ssh/known_hosts
+      - add_ssh_keys
+
+jobs:
+  start_prodcution:
+    executor: admin-docker
+    steps:
+      - project-setup
+      - run: yarn start:prod
+
+workflows:
+  deploy:
+    jobs:
+      - start_prodcution:
+          filters:
+            branches:
+              only:
+                - master

@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  instagram_server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: blackparadise0407/instagram_server:latest
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - app-network
