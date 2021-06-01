@@ -16,6 +16,8 @@ import App from '@app/modules/app/App';
 import AttachmentController from '@app/modules/attachment/AttachmentController';
 import AuthController from '@app/modules/auth/AuthController';
 import AbstractController from '@app/typings/AbstractController';
+import RoomTypeController from './modules/room-type/RoomTypeController';
+import RoomController from './modules/room/RoomController';
 import UserController from './modules/user/UserController';
 
 const app: Application = express();
@@ -26,6 +28,8 @@ const controllers: Array<AbstractController> = [
     new AuthController(),
     new AttachmentController(),
     new UserController(),
+    new RoomTypeController(),
+    new RoomController(),
 ];
 
 // Middlewares

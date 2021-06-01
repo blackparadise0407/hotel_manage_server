@@ -1,14 +1,15 @@
-import { IUser } from '@app/@types/global';
+import { IRole, IUser } from '@app/@types/global';
 import { BCRYPT_SALT_WORKER, TOKEN_CONFIG } from '@app/config';
-import fs from 'fs';
-import path from 'path';
-
-
 import AdvancedError from '@app/typings/AdvancedError';
 import * as genHTML from '@app/utils/genHTML';
 import bcryptjs from 'bcryptjs';
 import { Request, Response } from 'express';
+import fs from 'fs';
 import jwt, { SignOptions, VerifyOptions } from 'jsonwebtoken';
+import { forEach, includes } from 'lodash';
+import path from 'path';
+
+
 
 
 export const stringHash = async (str: string): Promise<string> => {
@@ -64,3 +65,20 @@ export const catchAsync = (fn: any) => (req: Request, res: Response, next: any) 
 };
 
 export { genHTML };
+
+export const hasRole = (user: IUser, roles: IRole[]): boolean => {
+    if (!includes(roles, user.role)) {
+        throw new AdvancedError({
+            message: 'User does not have permission',
+            type: 'not.permission',
+        }).setStatusCode(403);
+    } else return true;
+};
+
+export const filterParams = (obj: any, p: string[]) => {
+    const cloneObj = { ...obj };
+    forEach(p, (s) => {
+        delete obj[s];
+    });
+    return cloneObj;
+};

@@ -1,4 +1,4 @@
-import { IRole } from '@app/@types/global';
+import { IRole, RoomStatus } from '@app/@types/global';
 
 export enum Methods {
     GET = 'GET',
@@ -10,4 +10,6 @@ export enum Methods {
 
 export const AttachmentEnum = ['image'];
 
-export const UserRoleEnum: IRole[] = ['superadmin', 'customer'];
+export const UserRoleEnum: IRole[] = ['manager', 'employee'];
+
+export const RoomStatusEnum: RoomStatus[] = ['V', 'OCC'];

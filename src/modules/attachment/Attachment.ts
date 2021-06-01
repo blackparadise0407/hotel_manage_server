@@ -26,7 +26,10 @@ const attachmentSchemaDefinition: SchemaDefinition = {
 };
 
 const attachmentSchema = new Schema(attachmentSchemaDefinition, {
-    timestamps: true,
+    timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+    },
     versionKey: false,
 });
 

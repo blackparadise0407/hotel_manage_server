@@ -25,13 +25,16 @@ const UserSchemaDefinition: SchemaDefinition = {
     role: {
         type: String,
         enum: [...UserRoleEnum],
-        default: 'user',
+        default: 'employee',
     },
 };
 
 const userSchema = new Schema(UserSchemaDefinition, {
     versionKey: false,
-    timestamps: true,
+    timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+    },
 });
 
 // tslint:disable-next-line: only-arrow-functions

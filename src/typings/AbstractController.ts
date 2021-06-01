@@ -9,20 +9,11 @@ export default abstract class AbstractController {
     public router: Router = express.Router();
     public abstract path: string;
     protected abstract readonly routes: IRoute[] = [];
-    // constructor() {
-    //     this.validateArg = this.validateArg.bind(this);
-
-    // }
     public returnRoutes = (): Router => {
         forEach(this.routes, (r: IRoute) => {
             forEach(r.middleware, mw => {
                 this.router.use(r.path, mw);
             });
-            // if (r.validationSchema) {
-            //     console.log(r.validationSchema);
-            //     this.router.use(r.path, ...checkSchema(r.validationSchema), this.validateArg);
-            // }
-            // if (r.permission) { }
             const args: Array<IHandler | any> = [];
             if (r.validationSchema) args.push(...checkSchema(r.validationSchema), this.validateArg);
             args.push(catchAsync(r.handler));
@@ -51,16 +42,7 @@ export default abstract class AbstractController {
         return this.router;
     }
 
-
-    public filterParams(obj: any, p: string[]) {
-        const cloneObj = { ...obj };
-        forEach(p, (s) => {
-            delete obj[s];
-        });
-        return cloneObj;
-    }
-
-    public validateArg(req: Request, _res: Response, next): any {
+    private validateArg(req: Request, _res: Response, next): void {
         const { errors }: any = validationResult(req);
         if (errors.length) {
             const { location, param, msg, value: _value }: ExpressValidatorError = errors[0];
@@ -70,5 +52,6 @@ export default abstract class AbstractController {
             });
         } else next();
     }
+
 }
 
