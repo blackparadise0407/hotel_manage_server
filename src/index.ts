@@ -16,6 +16,7 @@ import App from '@app/modules/app/App';
 import AttachmentController from '@app/modules/attachment/AttachmentController';
 import AuthController from '@app/modules/auth/AuthController';
 import AbstractController from '@app/typings/AbstractController';
+import ReservationController from './modules/reservation/ReservationController';
 import RoomTypeController from './modules/room-type/RoomTypeController';
 import RoomController from './modules/room/RoomController';
 import UserController from './modules/user/UserController';
@@ -30,6 +31,7 @@ const controllers: Array<AbstractController> = [
     new UserController(),
     new RoomTypeController(),
     new RoomController(),
+    new ReservationController(),
 ];
 
 // Middlewares

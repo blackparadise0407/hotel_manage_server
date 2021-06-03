@@ -50,37 +50,48 @@ export interface ExpressValidatorError {
     value?: any;
 }
 
+export type GuestType = "foreign" | "domestic"
+
+export interface IGuest extends mongoose.Document {
+    full_name?: string;
+    id_no?: string;
+    address?: string;
+    guest_type?: GuestType;
+    created_at?: Date;
+    updated_at?: Date;
+}
 export interface IRoomType extends mongoose.Document {
-    name: string;
-    base_price: number;
-    created_at: Date;
-    updated_at: Date;
+    name?: string;
+    base_price?: number;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
-export type RoomStatus = "OCC" | "V"
+export type RoomStatus = "OCC" | "V";
 export interface IRoom extends mongoose.Document {
-    name: string;
-    number: number;
-    floor: number;
-    room_type: Types.ObjectId;
-    status: RoomStatus;
-    created_at: Date;
-    updated_at: Date;
+    name?: string;
+    number?: number;
+    floor?: number;
+    room_type?: Types.ObjectId;
+    status?: RoomStatus;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
 export interface IReservation extends mongoose.Document {
-    check_in: Date;
-    check_out: Date;
-    guests: Types.ObjectId[];
-    room_id: Types.ObjectId;
-    guest_id: Types.ObjectId;
+    check_in?: Date;
+    guests?: Types.ObjectId[];
+    room_id?: Types.ObjectId;
+    guest_id?: Types.ObjectId;
+    created_by?: Types.ObjectId;
 }
 
-export interface IPayment extends mongoose.Document {
-    total_amout: float;
-    billing_setting_id: Types.ObjectId;
-    reservation_id: Types.ObjectId;
-    guest_id: Types.ObjectId;
-    created_at: Date;
-    updated_at: Date;
+export interface IReceipt extends mongoose.Document {
+    total_amout?: float;
+    check_out?: Date;
+    billing_setting_id?: Types.ObjectId;
+    reservation_id?: Types.ObjectId;
+    guest_id?: Types.ObjectId;
+    created_at?: Date;
+    updated_at?: Date;
 }
