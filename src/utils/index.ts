@@ -9,9 +9,6 @@ import jwt, { SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { forEach, includes } from 'lodash';
 import path from 'path';
 
-
-
-
 export const stringHash = async (str: string): Promise<string> => {
     try {
         const salt = await bcryptjs.genSalt(BCRYPT_SALT_WORKER);
@@ -25,8 +22,10 @@ export const stringHash = async (str: string): Promise<string> => {
     }
 };
 
-
-export const tokenGen = ({ email, _id }: IUser, type: 'access' | 'refresh' = 'access'): string => {
+export const tokenGen = (
+    { email, _id, role }: IUser,
+    type: 'access' | 'refresh' = 'access',
+): string => {
     const options: SignOptions = {
         expiresIn: TOKEN_CONFIG.access.expire, // 1 hour
     };
@@ -37,19 +36,31 @@ export const tokenGen = ({ email, _id }: IUser, type: 'access' | 'refresh' = 'ac
         options.algorithm = 'RS256';
         options.expiresIn = TOKEN_CONFIG.refresh.expire; // 8 hours
     }
-    return jwt.sign({ _id, email }, `${type === 'refresh' ? keyPem : process.env.JWT_KEY}`, options);
+    return jwt.sign(
+        { _id, email, role },
+        `${type === 'refresh' ? keyPem : process.env.JWT_KEY}`,
+        options,
+    );
 };
 
-export const validateToken = (token: string, type: 'refresh' | 'access' = 'access') => {
+export const validateToken = (
+    token: string,
+    type: 'refresh' | 'access' = 'access',
+) => {
     try {
         const rootDir = path.dirname(__dirname);
-        const keyPem = fs.readFileSync(path.join(rootDir, '/.ssh/jwtRS256.key'));
-        const opt: VerifyOptions = {
-        };
+        const keyPem = fs.readFileSync(
+            path.join(rootDir, '/.ssh/jwtRS256.key'),
+        );
+        const opt: VerifyOptions = {};
         if (type === 'refresh') {
             opt.algorithms = ['RS256'];
         }
-        const decoded = jwt.verify(token, type === 'refresh' ? keyPem : `${process.env.JWT_KEY}`, opt);
+        const decoded = jwt.verify(
+            token,
+            type === 'refresh' ? keyPem : `${process.env.JWT_KEY}`,
+            opt,
+        );
         return decoded;
     } catch (error) {
         throw new AdvancedError({
@@ -57,22 +68,24 @@ export const validateToken = (token: string, type: 'refresh' | 'access' = 'acces
             type: 'jwt.error',
         });
     }
-
 };
 
-export const catchAsync = (fn: any) => (req: Request, res: Response, next: any) => {
-    Promise.resolve(fn(req, res, next)).catch((err) => next(err));
-};
+export const catchAsync =
+    (fn: any) => (req: Request, res: Response, next: any) => {
+        Promise.resolve(fn(req, res, next)).catch((err) => next(err));
+    };
 
 export { genHTML };
 
-export const hasRole = (user: IUser, roles: IRole[]): boolean => {
+export const hasRole = (user: IUser, roles: IRole[]): void => {
     if (!includes(roles, user.role)) {
-        throw new AdvancedError({
+        const error = new AdvancedError({
             message: 'User does not have permission',
             type: 'not.permission',
-        }).setStatusCode(403);
-    } else return true;
+        });
+        error.setStatusCode(403);
+        throw error;
+    }
 };
 
 export const filterParams = (obj: any, p: string[]) => {

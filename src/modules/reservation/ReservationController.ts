@@ -1,4 +1,10 @@
-import { IReservation, IRoom, IRoute } from '@app/@types/global';
+import {
+    IBillingSetting,
+    IGuest,
+    IReservation,
+    IRoom,
+    IRoute,
+} from '@app/@types/global';
 import { auth } from '@app/services';
 import AbstractController from '@app/typings/AbstractController';
 import AdvancedError from '@app/typings/AdvancedError';
@@ -7,6 +13,8 @@ import { Methods } from '@app/typings/Enum';
 import { filterParams } from '@app/utils';
 import { Request, Response } from 'express';
 import { includes, map } from 'lodash';
+import BillingSetting from '../billing-setting/BillingSetting';
+import Guest from '../guest/Guest';
 import Room from '../room/Room';
 import Reservation from './Reservation';
 
@@ -24,15 +32,6 @@ class ReservationController extends AbstractController {
             method: Methods.POST,
             validationSchema: {
                 check_in: {
-                    in: 'body',
-                    notEmpty: { errorMessage: 'is required' },
-                    isString: { errorMessage: 'is invalid' },
-                },
-                guests: {
-                    in: 'body',
-                    isArray: { errorMessage: 'is invalid' },
-                },
-                guest_id: {
                     in: 'body',
                     notEmpty: { errorMessage: 'is required' },
                     isString: { errorMessage: 'is invalid' },
@@ -66,6 +65,8 @@ class ReservationController extends AbstractController {
             handler: this.deleteById,
         },
     ];
+
+    // Create reservation only vancan room
     protected async create(
         { body, user }: Request,
         res: Response,
@@ -73,19 +74,37 @@ class ReservationController extends AbstractController {
         const roomFilter: any = {
             status: 'V',
         };
-        const vacanRoom = (await Room.find(roomFilter)) as IRoom[];
-        const vacanRoomId: string[] = map(vacanRoom, (r: IRoom) =>
+        const vacantRoom = (await Room.find(roomFilter)) as IRoom[];
+        const vacantRoomId: string[] = map(vacantRoom, (r: IRoom) =>
             r._id.toString(),
         );
 
-        if (!includes(vacanRoomId, body['room_id'])) {
+        if (!includes(vacantRoomId, body['room_id'])) {
             throw new AdvancedError({
                 message: 'Room is not empty',
                 type: 'bad.request',
             });
         }
 
+        // Creating guests
+
+        const insertedGuest = [body['guest'], ...body['guests']];
+        const guests = (await Guest.insertMany(insertedGuest)) as IGuest[];
+        const guestId = guests[0]._id;
+        body['guest_id'] = guestId;
+        body['guests'] = map(guests, (i) => i._id);
+
+        const billingSettings = (await BillingSetting.find({
+            status: 'active',
+        })) as IBillingSetting[];
+        if (!billingSettings.length) {
+            throw new AdvancedError({
+                message: 'No billing setting found',
+                type: 'not.found',
+            });
+        }
         body['created_by'] = user._id;
+        body['billing_setting_id'] = billingSettings[0]._id;
         const reservation = (await Reservation.create(body)) as IReservation;
         if (reservation) {
             await Room.updateOne(
@@ -106,6 +125,7 @@ class ReservationController extends AbstractController {
             }),
         );
     }
+    // Get reservation by id
     protected async updateById(req: Request, res: Response): Promise<void> {
         const { body } = req;
         const { room_id, _id }: IReservation = body;
@@ -124,16 +144,14 @@ class ReservationController extends AbstractController {
                 { $set: { ...reservation } },
             );
         } else {
-            console.log('why if not else;');
-
             const roomFilter: any = {
                 status: 'V',
             };
-            const vacanRoom = (await Room.find(roomFilter)) as IRoom[];
-            const vacanRoomId: string[] = map(vacanRoom, (r: IRoom) =>
+            const vacantRoom = (await Room.find(roomFilter)) as IRoom[];
+            const vacantRoomId: string[] = map(vacantRoom, (r: IRoom) =>
                 r._id.toString(),
             );
-            if (!includes(vacanRoomId, room_id.toString())) {
+            if (!includes(vacantRoomId, room_id.toString())) {
                 throw new AdvancedError({
                     message: 'Room is not empty',
                     type: 'bad.request',
@@ -155,7 +173,7 @@ class ReservationController extends AbstractController {
             }),
         );
     }
-
+    // delete reservation by id
     protected async deleteById({ params }: Request, res: Response) {
         const { id } = params;
         const reservation = (await Reservation.findById(id)) as IReservation;

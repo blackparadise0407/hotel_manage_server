@@ -7,8 +7,6 @@ import { Methods } from '@app/typings/Enum';
 import { tokenGen, validateToken } from '@app/utils';
 import { Request, Response } from 'express';
 
-
-
 class AuthController extends AbstractController {
     path = '/auth';
     routes: IRoute[] = [
@@ -75,7 +73,7 @@ class AuthController extends AbstractController {
         super();
     }
 
-    private async register(req: Request, res: Response, next) {
+    private async register(req: Request, res: Response) {
         const { email, password, username } = req.body;
         const existedUser = await User.findOne({ email });
         if (existedUser) {
@@ -92,24 +90,23 @@ class AuthController extends AbstractController {
         const savedUser: IUser = await newUser.save();
         const accessToken: string = tokenGen(savedUser);
         const refreshTk: string = tokenGen(savedUser, 'refresh');
-        res.send(new AdvancedResponse({
-            data: { accessToken, refreshToken: refreshTk },
-        }));
-
+        res.send(
+            new AdvancedResponse({
+                data: { accessToken, refreshToken: refreshTk },
+            }),
+        );
     }
 
-
-    private async login(req: Request, res: Response, next) {
+    private async login(req: Request, res: Response) {
         const { email, password } = req.body;
 
-        const existedUser = await User.findOne({ email }) as IUser;
+        const existedUser = (await User.findOne({ email })) as IUser;
         if (!existedUser) {
             throw new AdvancedError({
                 message: 'User not found',
                 type: 'not.found',
             });
         }
-
 
         const match = await existedUser.comparePassword(password);
         if (!match) {
@@ -122,15 +119,17 @@ class AuthController extends AbstractController {
         const accessToken: string = tokenGen(existedUser);
         const refreshTk: string = tokenGen(existedUser, 'refresh');
 
-        res.send(new AdvancedResponse({
-            data: {
-                accessToken,
-                refreshToken: refreshTk,
-            },
-        }));
+        res.send(
+            new AdvancedResponse({
+                data: {
+                    accessToken,
+                    refreshToken: refreshTk,
+                },
+            }),
+        );
     }
 
-    private async refreshToken(req: Request, res: Response, next) {
+    private async refreshToken(req: Request, res: Response) {
         const { refreshToken: token } = req.body;
 
         const { _id }: any = validateToken(token, 'refresh');
@@ -142,14 +141,14 @@ class AuthController extends AbstractController {
             });
         }
         const accessToken = tokenGen(user);
-        res.send(new AdvancedResponse({
-            data: {
-                accessToken,
-            },
-        }));
+        res.send(
+            new AdvancedResponse({
+                data: {
+                    accessToken,
+                },
+            }),
+        );
     }
-
-
 }
 
 export default AuthController;

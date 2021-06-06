@@ -1,4 +1,10 @@
-import { IRole, RoomStatus } from '@app/@types/global';
+import {
+    BillingSettingStatus,
+    GuestType,
+    IRole,
+    ReservationStatus,
+    RoomStatus,
+} from '@app/@types/global';
 
 export enum Methods {
     GET = 'GET',
@@ -13,3 +19,15 @@ export const AttachmentEnum = ['image'];
 export const UserRoleEnum: IRole[] = ['manager', 'employee'];
 
 export const RoomStatusEnum: RoomStatus[] = ['V', 'OCC'];
+
+export const GuestTypeEnum: GuestType[] = ['domestic', 'foreign'];
+
+export const ReservationStatusEnum: ReservationStatus[] = [
+    'active',
+    'inactive',
+];
+
+export const BillingSettingStatusEnum: BillingSettingStatus[] = [
+    'active',
+    'inactive',
+];

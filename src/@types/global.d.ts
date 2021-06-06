@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { Schema as ExpressValidatorSchema } from "express-validator";
-import mongoose, { Types } from "mongoose";
+import { NextFunction, Request, Response } from 'express';
+import { Schema as ExpressValidatorSchema } from 'express-validator';
+import mongoose, { Date, Types } from 'mongoose';
 export interface IRoute {
     path: string;
     method: Methods;
@@ -13,10 +13,10 @@ export interface IRoute {
 export type IMiddleware = (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
 ) => any;
 
-export type IRole = "manager" | "employee";
+export type IRole = 'manager' | 'employee';
 export interface IUser extends mongoose.Document {
     username: string;
     email: string;
@@ -24,8 +24,6 @@ export interface IUser extends mongoose.Document {
     createdAt: Date;
     updatedAt: Date;
     role: IRole;
-    created_at: Date;
-    updated_at: Date;
     // Methods:
     comparePassword: (str: string) => any;
     hasPermission: (pers: IRole[]) => boolean;
@@ -36,9 +34,7 @@ export interface IAttachment extends mongoose.Document {
     name: string;
     url: string;
     size: number;
-    category: "image";
-    created_at: Date;
-    updated_at: Date;
+    category: 'image';
 }
 
 export type IHandler = (req: Request, res: Response, next: NextFunction) => any;
@@ -50,48 +46,51 @@ export interface ExpressValidatorError {
     value?: any;
 }
 
-export type GuestType = "foreign" | "domestic"
+export type GuestType = 'foreign' | 'domestic';
 
 export interface IGuest extends mongoose.Document {
-    full_name?: string;
-    id_no?: string;
-    address?: string;
-    guest_type?: GuestType;
-    created_at?: Date;
-    updated_at?: Date;
+    full_name: string;
+    id_no: string;
+    address: string;
+    guest_type: GuestType;
 }
 export interface IRoomType extends mongoose.Document {
-    name?: string;
-    base_price?: number;
-    created_at?: Date;
-    updated_at?: Date;
+    name: string;
+    base_price: number;
 }
 
-export type RoomStatus = "OCC" | "V";
+export type RoomStatus = 'OCC' | 'V';
 export interface IRoom extends mongoose.Document {
-    name?: string;
-    number?: number;
-    floor?: number;
-    room_type?: Types.ObjectId;
-    status?: RoomStatus;
-    created_at?: Date;
-    updated_at?: Date;
+    name: string;
+    number: number;
+    floor: number;
+    room_type: Types.ObjectId;
+    status: RoomStatus;
 }
 
+export type ReservationStatus = 'active' | 'inactive';
 export interface IReservation extends mongoose.Document {
-    check_in?: Date;
-    guests?: Types.ObjectId[];
-    room_id?: Types.ObjectId;
-    guest_id?: Types.ObjectId;
-    created_by?: Types.ObjectId;
+    check_in: Date;
+    guests: Types.ObjectId[];
+    room_id: Types.ObjectId;
+    guest_id: Types.ObjectId;
+    billing_setting_id: Types.ObjectId;
+    status: ReservationStatus;
+    created_by: Types.ObjectId;
 }
 
 export interface IReceipt extends mongoose.Document {
-    total_amout?: float;
-    check_out?: Date;
-    billing_setting_id?: Types.ObjectId;
-    reservation_id?: Types.ObjectId;
-    guest_id?: Types.ObjectId;
-    created_at?: Date;
-    updated_at?: Date;
+    total_amount: number;
+    check_out: Date;
+    billing_setting_id: Types.ObjectId;
+    reservation_id: Types.ObjectId;
+    created_by: Types.ObjectId;
+}
+
+export type BillingSettingStatus = 'active' | 'inactive';
+export interface IBillingSetting extends mongoose.Document {
+    foreign_guest_coefficient: number;
+    third_guest_percentage: number;
+    status: BillingSettingStatus;
+    created_by: Types.ObjectId;
 }

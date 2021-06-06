@@ -4,38 +4,39 @@ import { UserRoleEnum } from '@app/typings/Enum';
 import { stringHash } from '@app/utils';
 import bcryptjs from 'bcryptjs';
 import { includes } from 'lodash';
-import mongoose, { Schema, SchemaDefinition } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-const UserSchemaDefinition: SchemaDefinition = {
-    username: {
-        type: String,
-        required: true,
+const userSchema = new Schema(
+    {
+        username: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+        password: {
+            type: String,
+        },
+        google_id: {
+            type: String,
+        },
+        role: {
+            type: String,
+            enum: [...UserRoleEnum],
+            default: 'employee',
+        },
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
+    {
+        versionKey: false,
+        timestamps: {
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+        },
     },
-    password: {
-        type: String,
-    },
-    google_id: {
-        type: String,
-    },
-    role: {
-        type: String,
-        enum: [...UserRoleEnum],
-        default: 'employee',
-    },
-};
-
-const userSchema = new Schema(UserSchemaDefinition, {
-    versionKey: false,
-    timestamps: {
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-    },
-});
+);
 
 // tslint:disable-next-line: only-arrow-functions
 userSchema.pre('save', async function (next) {
@@ -50,7 +51,9 @@ userSchema.pre('save', async function (next) {
     }
 });
 
-userSchema.methods.comparePassword = async function (comparedString: string): Promise<boolean> {
+userSchema.methods.comparePassword = async function (
+    comparedString: string,
+): Promise<boolean> {
     const user = this as IUser;
     try {
         return await bcryptjs.compare(comparedString, user.password);
