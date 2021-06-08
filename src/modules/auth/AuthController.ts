@@ -92,7 +92,11 @@ class AuthController extends AbstractController {
         const refreshTk: string = tokenGen(savedUser, 'refresh');
         res.send(
             new AdvancedResponse({
-                data: { accessToken, refreshToken: refreshTk },
+                data: {
+                    user: savedUser,
+                    accessToken,
+                    refreshToken: refreshTk,
+                },
             }),
         );
     }
@@ -122,6 +126,7 @@ class AuthController extends AbstractController {
         res.send(
             new AdvancedResponse({
                 data: {
+                    user: existedUser,
                     accessToken,
                     refreshToken: refreshTk,
                 },

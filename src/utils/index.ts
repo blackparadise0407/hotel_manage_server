@@ -63,10 +63,12 @@ export const validateToken = (
         );
         return decoded;
     } catch (error) {
-        throw new AdvancedError({
+        const err = new AdvancedError({
             message: error.message,
             type: 'jwt.error',
         });
+        if (error.message === 'jwt expired') err.setStatusCode(401);
+        throw err;
     }
 };
 

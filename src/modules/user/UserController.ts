@@ -36,20 +36,20 @@ class UserController extends AbstractController {
         },
     ];
 
-    private async get(req: Request, res: Response, next) {
-
+    private async get(req: Request, res: Response) {
         let user = req.user as IUser;
-        user = await User.findById(user._id) as IUser;
-        res.send(new AdvancedResponse({
-            data: user,
-        }));
-
+        user = (await User.findById(user._id)) as IUser;
+        res.send(
+            new AdvancedResponse({
+                data: user,
+            }),
+        );
     }
 
-    private async forgetPassword(req: Request, res: Response, next) {
+    private async forgetPassword(req: Request, res: Response) {
         const { email } = req.body;
 
-        const existedUser = await User.findOne({ email }) as IUser;
+        const existedUser = (await User.findOne({ email })) as IUser;
         if (!existedUser) {
             throw new AdvancedError({
                 message: 'User not found',
@@ -57,14 +57,13 @@ class UserController extends AbstractController {
             });
         }
         await sendForgetPasswordMail(existedUser.email, []);
-        res.send(new AdvancedResponse({
-            data: {},
-            message: 'Email has been sent',
-        }));
-
+        res.send(
+            new AdvancedResponse({
+                data: {},
+                message: 'Email has been sent',
+            }),
+        );
     }
-
-
 }
 
 export default UserController;

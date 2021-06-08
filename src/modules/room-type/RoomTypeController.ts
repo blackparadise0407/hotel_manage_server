@@ -8,7 +8,6 @@ import { Request, Response } from 'express';
 import { forEach } from 'lodash';
 import RoomType from './RoomType';
 
-
 class RoomTypeController extends AbstractController {
     path = '/room-type';
     routes: IRoute[] = [
@@ -60,37 +59,45 @@ class RoomTypeController extends AbstractController {
     ];
 
     protected async get(_req: Request, res: Response) {
-        res.send(new AdvancedResponse({
-            data: await RoomType.find(),
-        }));
+        res.send(
+            new AdvancedResponse({
+                data: await RoomType.find().sort({ name: 1 }),
+            }),
+        );
     }
 
     protected async create({ body }: Request, res: Response) {
-        const existed = await RoomType.find() as IRoomType[];
-        forEach(existed, r => {
-            if (r.name === body.name) throw new AdvancedError({
-                message: 'Duplicate room type name',
-                type: 'duplicate',
-            });
+        const existed = (await RoomType.find()) as IRoomType[];
+        forEach(existed, (r) => {
+            if (r.name === body.name)
+                throw new AdvancedError({
+                    message: 'Duplicate room type name',
+                    type: 'duplicate',
+                });
         });
         body.name = body.name.toUpperCase();
         const roomType = await RoomType.create(body);
-        res.send(new AdvancedResponse({
-            data: roomType,
-        }));
+        res.send(
+            new AdvancedResponse({
+                data: roomType,
+            }),
+        );
     }
 
     protected async update({ body, params }: Request, res: Response) {
-        const existed = await RoomType.findById(params.id) as IRoomType;
-        if (!existed) throw new AdvancedError({
-            message: 'Room type not found',
-            type: 'not.found',
-        });
+        const existed = (await RoomType.findById(params.id)) as IRoomType;
+        if (!existed)
+            throw new AdvancedError({
+                message: 'Room type not found',
+                type: 'not.found',
+            });
         existed.set(body);
         await existed.save();
-        res.send(new AdvancedResponse({
-            data: existed,
-        }));
+        res.send(
+            new AdvancedResponse({
+                data: existed,
+            }),
+        );
     }
 }
 

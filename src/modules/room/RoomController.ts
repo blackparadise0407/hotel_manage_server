@@ -55,7 +55,7 @@ class RoomController extends AbstractController {
     ];
     protected async get(_req: Request, res: Response) {
         res.send(new AdvancedResponse({
-            data: await Room.find() as IRoom[],
+            data: await Room.find().populate('room_type') as IRoom[],
         }));
     }
 

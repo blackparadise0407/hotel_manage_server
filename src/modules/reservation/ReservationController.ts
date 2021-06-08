@@ -119,9 +119,29 @@ class ReservationController extends AbstractController {
         );
     }
     protected async getAll(_req: Request, res: Response): Promise<void> {
+        const aggregates: any = [];
+        const lookups: any = [
+            {
+                $lookup: {
+                    from: 'guests',
+                    localField: 'guest_id',
+                    foreignField: '_id',
+                    as: 'guest',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$guest',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+        ];
         res.send(
             new AdvancedResponse({
-                data: (await Reservation.find()) as IReservation[],
+                data: (await Reservation.find()
+                    .populate('guest_id')
+                    .populate('room_id')
+                    .sort({ updated_at: -1 })) as IReservation[],
             }),
         );
     }
