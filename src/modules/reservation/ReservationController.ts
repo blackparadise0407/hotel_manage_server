@@ -88,7 +88,7 @@ class ReservationController extends AbstractController {
 
         // Creating guests
 
-        const insertedGuest = [body['guest'], ...body['guests']];
+        const insertedGuest = [...body['guests']];
         const guests = (await Guest.insertMany(insertedGuest)) as IGuest[];
         const guestId = guests[0]._id;
         body['guest_id'] = guestId;
