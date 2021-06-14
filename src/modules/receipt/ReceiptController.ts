@@ -30,23 +30,22 @@ class ReceiptController extends AbstractController {
                     in: 'body',
                     notEmpty: { errorMessage: 'is required' },
                 },
-                reservation_id: {
-                    in: 'body',
-                    notEmpty: { errorMessage: 'is required' },
-                    isString: { errorMessage: 'is invalid' },
-                },
             },
             middleware: [auth],
             handler: this.create,
         },
     ];
 
-    protected async create({ body, user }: Request, res: Response) {
-        const { reservation_id, check_out } = body;
-
-        const reservation = (await Reservation.findById(
-            reservation_id,
-        )) as IReservation;
+    protected async create({ body }: Request, res: Response) {
+        const { reservation_id, check_out, room_id } = body;
+        let reservation: IReservation;
+        if (!reservation_id) {
+            reservation = await Reservation.findOne({ room_id });
+        } else {
+            reservation = (await Reservation.findById(
+                reservation_id,
+            )) as IReservation;
+        }
         if (!reservation) {
             throw new AdvancedError({
                 message: 'Reservation not found',
@@ -105,6 +104,10 @@ class ReceiptController extends AbstractController {
         await Room.updateOne(
             { _id: reservation.room_id },
             { $set: { status: 'V' } },
+        );
+        await Reservation.updateOne(
+            { _id: reservation._id },
+            { $set: { status: 'inactive' } },
         );
 
         res.send(
