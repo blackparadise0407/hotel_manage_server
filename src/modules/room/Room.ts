@@ -17,6 +17,10 @@ const roomSchema = new Schema(
             ref: 'RoomType',
             required: true,
         },
+        room_name: {
+            type: String,
+            // required: true,
+        },
         status: {
             type: String,
             enum: [...RoomStatusEnum],
@@ -31,13 +35,17 @@ const roomSchema = new Schema(
         },
     },
 );
-
+roomSchema.pre('save', async function (next) {
+    const room: any = this;
+    room.room_name = `${room.floor}${String('0' + room.number).slice(-2)}`;
+    next();
+});
 // tslint:disable-next-line: only-arrow-functions
-roomSchema
-    .virtual('room_name')
-    .get(function (this: { floor: number; number: number }) {
-        return `${this.floor}${String('0' + this.number).slice(-2)}`;
-    });
+// roomSchema
+//     .virtual('room_name')
+//     .get(function (this: { floor: number; number: number }) {
+//         return `${this.floor}${String('0' + this.number).slice(-2)}`;
+//     });
 
 roomSchema.set('toObject', {
     virtuals: true,

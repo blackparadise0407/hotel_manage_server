@@ -63,6 +63,7 @@ export type RoomStatus = 'OCC' | 'V';
 export interface IRoom extends mongoose.Document {
     name: string;
     number: number;
+    room_name: string;
     floor: number;
     room_type: Types.ObjectId;
     status: RoomStatus;
