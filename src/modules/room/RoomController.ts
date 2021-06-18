@@ -1,4 +1,5 @@
 import { IRoom, IRoute } from '@app/@types/global';
+import { ROOM } from '@app/config';
 import { auth } from '@app/services';
 import AbstractController from '@app/typings/AbstractController';
 import AdvancedError from '@app/typings/AdvancedError';
@@ -67,6 +68,19 @@ class RoomController extends AbstractController {
             middleware: [auth],
             handler: this.getById,
         },
+        {
+            path: '/delete-by-id/:id',
+            method: Methods.DELETE,
+            validationSchema: {
+                id: {
+                    in: 'params',
+                    notEmpty: { errorMessage: 'is required' },
+                    isString: { errorMessage: 'is invalid' },
+                },
+            },
+            middleware: [auth],
+            handler: this.deleteById,
+        },
     ];
     protected async get({ query }: Request, res: Response) {
         const { room_type, status } = query;
@@ -118,13 +132,29 @@ class RoomController extends AbstractController {
 
     protected async create({ user, body }: Request, res: Response) {
         hasRole(user, ['manager']);
-        const { number: roomNumber, floor } = body;
+        let { number: roomNumber, floor } = body;
+        roomNumber = parseInt(roomNumber, 10);
+        floor = parseInt(floor, 10);
+
+        if (roomNumber > ROOM.MAX_ROOM) {
+            throw new AdvancedError({
+                message: 'Room number cannot exceed ' + ROOM.MAX_ROOM,
+                type: 'invalid',
+            });
+        }
+
+        if (floor > ROOM.MAX_FLOOR) {
+            throw new AdvancedError({
+                message: 'Floor cannot exceed ' + ROOM.MAX_FLOOR,
+                type: 'invalid',
+            });
+        }
         const existedRooms = (await Room.find()) as IRoom[];
         if (
-            some(
-                existedRooms,
-                (r) => r.number === roomNumber && r.floor === floor,
-            )
+            some(existedRooms, {
+                number: roomNumber,
+                floor,
+            })
         ) {
             throw new AdvancedError({
                 message: 'Room already exists',
@@ -172,7 +202,9 @@ class RoomController extends AbstractController {
         );
     }
 
-    protected async getById({ params }: Request, res: Response) {
+    protected async getById({ params, user }: Request, res: Response) {
+        hasRole(user, ['manager']);
+
         const room = (await Room.findById(params.id)) as IRoom;
         if (!room)
             throw new AdvancedError({
@@ -182,6 +214,28 @@ class RoomController extends AbstractController {
         res.send(
             new AdvancedResponse({
                 data: room,
+            }),
+        );
+    }
+
+    protected async deleteById({ params, user }: Request, res: Response) {
+        hasRole(user, ['manager']);
+        const room = (await Room.findOne({
+            _id: params.id,
+            status: 'V',
+        })) as IRoom;
+
+        if (!room) {
+            throw new AdvancedError({
+                message: 'Room is currently in use',
+                type: 'invalid',
+            });
+        }
+        await Room.deleteOne({ _id: room._id });
+        res.send(
+            new AdvancedResponse({
+                data: {},
+                message: 'Delete room successfully',
             }),
         );
     }

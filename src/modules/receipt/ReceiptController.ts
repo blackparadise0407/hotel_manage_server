@@ -40,7 +40,10 @@ class ReceiptController extends AbstractController {
         const { reservation_id, check_out, room_id } = body;
         let reservation: IReservation;
         if (!reservation_id) {
-            reservation = await Reservation.findOne({ room_id });
+            reservation = await Reservation.findOne({
+                room_id,
+                status: 'active',
+            });
         } else {
             reservation = (await Reservation.findById(
                 reservation_id,
@@ -71,6 +74,13 @@ class ReceiptController extends AbstractController {
             });
         }
         const check_in: any = reservation.check_in;
+        if (moment(check_out).isBefore(moment(check_in))) {
+            throw new AdvancedError({
+                message: 'Check-out time cannot be before check-in time',
+                type: 'invalid',
+            });
+        }
+
         const duration: number =
             moment(check_out).diff(moment(check_in), 'days') + 1;
 
@@ -107,7 +117,8 @@ class ReceiptController extends AbstractController {
         );
         await Reservation.updateOne(
             { _id: reservation._id },
-            { $set: { status: 'inactive' } },
+            { $set: { status: 'inactive', check_out } },
+            { upsert: true },
         );
 
         res.send(

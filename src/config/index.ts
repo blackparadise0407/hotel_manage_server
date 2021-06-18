@@ -15,8 +15,8 @@ export const SUCCESS = 'Success';
 
 export const SUCCESS_CODE = 200;
 
-export const GOOGLE = 'https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&include_granted_scopes=true&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fauth%2Fgoogle%2Fcallback&client_id=26271358546-0fea8k8agk8m7gqeas4gc245idubl7ve.apps.googleusercontent.com&flowName=GeneralOAuthFlow';
-
+export const GOOGLE =
+    'https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile&include_granted_scopes=true&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A5050%2Fauth%2Fgoogle%2Fcallback&client_id=26271358546-0fea8k8agk8m7gqeas4gc245idubl7ve.apps.googleusercontent.com&flowName=GeneralOAuthFlow';
 
 export const UPLOAD = {
     limits: {
@@ -48,4 +48,9 @@ export const CLOUDINARY = {
 export const HOST = {
     name: 'Instagram',
     url: isDev ? 'https://instagram.kyle-pham' : 'http://localhost:5050',
+};
+
+export const ROOM = {
+    MAX_FLOOR: 5,
+    MAX_ROOM: 6,
 };

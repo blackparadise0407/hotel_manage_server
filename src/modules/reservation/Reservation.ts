@@ -8,6 +8,9 @@ const roomTypeSchema = new Schema(
             type: Date,
             required: true,
         },
+        check_out: {
+            type: Date,
+        },
         guests: [
             {
                 type: Schema.Types.ObjectId,

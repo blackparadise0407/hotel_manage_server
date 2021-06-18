@@ -72,6 +72,7 @@ export interface IRoom extends mongoose.Document {
 export type ReservationStatus = 'active' | 'inactive';
 export interface IReservation extends mongoose.Document {
     check_in: Date;
+    check_out?: Date;
     guests: Types.ObjectId[];
     room_id: Types.ObjectId;
     guest_id: Types.ObjectId;

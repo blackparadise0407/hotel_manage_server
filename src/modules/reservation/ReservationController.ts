@@ -119,31 +119,105 @@ class ReservationController extends AbstractController {
         );
     }
     protected async getAll(_req: Request, res: Response): Promise<void> {
-        const aggregates: any = [];
-        const lookups: any = [
+        const aggregates: any = [
             {
                 $lookup: {
                     from: 'guests',
                     localField: 'guest_id',
                     foreignField: '_id',
-                    as: 'guest',
+                    as: 'guest_id',
                 },
             },
             {
                 $unwind: {
-                    path: '$guest',
+                    path: '$guest_id',
                     preserveNullAndEmptyArrays: true,
                 },
             },
+            {
+                $lookup: {
+                    from: 'receipts',
+                    localField: '_id',
+                    foreignField: 'reservation_id',
+                    as: 'receipts',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$receipts',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'rooms',
+                    localField: 'room_id',
+                    foreignField: '_id',
+                    as: 'room_id',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$room_id',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'roomtypes',
+                    localField: 'room_id.room_type',
+                    foreignField: '_id',
+                    as: 'room_id.room_type',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$room_id.room_type',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    status: 1,
+                    room_id: {
+                        _id: 1,
+                        room_name: 1,
+                        room_type: {
+                            name: 1,
+                        },
+                    },
+                    receipts: {
+                        check_out: 1,
+                        total_amount: 1,
+                    },
+                    guest_id: {
+                        full_name: 1,
+                    },
+                    check_out: 1,
+                    check_in: 1,
+                    updated_at: 1,
+                    created_at: 1,
+                },
+            },
+            {
+                $sort: { updated_at: -1 },
+            },
         ];
+        const resp = await Reservation.aggregate(aggregates);
         res.send(
             new AdvancedResponse({
-                data: (await Reservation.find()
-                    .populate('guest_id')
-                    .populate('room_id')
-                    .sort({ updated_at: -1 })) as IReservation[],
+                data: resp,
             }),
         );
+        // res.send(
+        //     new AdvancedResponse({
+        //         data: (await Reservation.find()
+        //             .populate('guest_id')
+        //             .populate('room_id')
+        //             .sort({ updated_at: -1 })) as IReservation[],
+        //     }),
+        // );
     }
     // Get reservation by id
     protected async updateById(req: Request, res: Response): Promise<void> {

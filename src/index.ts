@@ -16,6 +16,7 @@ import App from '@app/modules/app/App';
 import AttachmentController from '@app/modules/attachment/AttachmentController';
 import AuthController from '@app/modules/auth/AuthController';
 import AbstractController from '@app/typings/AbstractController';
+import AnalyticController from './modules/analytic/AnalyticController';
 import BillingSettingController from './modules/billing-setting/BillingSettingController';
 import ReceiptController from './modules/receipt/ReceiptController';
 import ReservationController from './modules/reservation/ReservationController';
@@ -36,6 +37,7 @@ const controllers: Array<AbstractController> = [
     new ReservationController(),
     new ReceiptController(),
     new BillingSettingController(),
+    new AnalyticController(),
 ];
 
 // Middlewares
