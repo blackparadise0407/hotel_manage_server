@@ -58,6 +58,15 @@ class AuthController extends AbstractController {
                         errorMessage: 'is invalid',
                     },
                 },
+                password: {
+                    in: ['body'],
+                    notEmpty: {
+                        errorMessage: 'is required',
+                    },
+                    isString: {
+                        errorMessage: 'is invalid',
+                    },
+                },
             },
             middleware: [],
             handler: this.register,
