@@ -1,15 +1,15 @@
-FROM node:14.16.1-alpine3.12
+FROM node:14.17-alpine
 
-RUN mkdir -p /home/apps/instagram/server/node_modules 
-# Create app directory
-WORKDIR /home/apps/instagram/server
+RUN mkdir -p /home/kyle/apps/hotel_manage_server/node_modules
 
-COPY package*.json /server/
+WORKDIR /home/kyle/apps/hotel_manage_server
 
-RUN npm install
+COPY package*.json ./
+
+RUN npm install --silent
 
 COPY . .
 
 EXPOSE 8008
 
-CMD ["npm run", "start:prod"]
+CMD ["npm", "run", "start:prod"]

@@ -1,6 +1,5 @@
 import {
     IBillingSetting,
-    IGuest,
     IReservation,
     IRoom,
     IRoute,
@@ -89,7 +88,7 @@ class ReservationController extends AbstractController {
         // Creating guests
 
         const insertedGuest = [...body['guests']];
-        const guests = (await Guest.insertMany(insertedGuest)) as IGuest[];
+        const guests = (await Guest.insertMany(insertedGuest)) as any;
         const guestId = guests[0]._id;
         body['guest_id'] = guestId;
         body['guests'] = map(guests, (i) => i._id);

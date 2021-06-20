@@ -1,16 +1,19 @@
-version: "3"
+version: '3'
 
 services:
-  instagram_server:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: blackparadise0407/instagram_server:latest
-  mongo:
-    image: mongo:latest
-    container_name: mongodb
-    restart: unless-stopped
-    volumes:
-      - dbdata:/data/db
-    networks:
-      - app-network
+    hotel_manage_server:
+        restart: always
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: blackparadise0407/hotel_manage_server
+        ports:
+            - '8008:8008'
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb:/data/db
+volumes:
+    mongodb:
