@@ -1,12 +1,12 @@
 FROM node:14.17-alpine
 
-RUN mkdir -p /home/kyle/apps/hotel_manage_server/node_modules
+RUN mkdir -p /app/node_modules
 
-WORKDIR /home/kyle/apps/hotel_manage_server
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --silent
+RUN npm install
 
 COPY . .
 
