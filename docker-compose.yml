@@ -1,17 +1,19 @@
 version: '3'
 
 services:
-    # mongo:
-    #     image: mongo
-    #     ports:
-    #         - 27017:27018
-    #     volumes:
-    #         - mongodb:/data/db
-    hotel_manage_server:
-        restart: always
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb:/data/db
+    api:
+        # restart: always
         build:
             context: .
             dockerfile: Dockerfile
+        depends_on:
+            - mongo
         image: blackparadise0407/hotel_manage_server
         env_file:
             - .prod.env
@@ -19,5 +21,5 @@ services:
             - NODE_ENV=production
         ports:
             - '8008:8008'
-# volumes:
-# mongodb:
+volumes:
+    mongodb:
