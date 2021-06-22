@@ -14,7 +14,7 @@
         "start": "node .",
         "start:dev": "NODE_ENV=development npm-run-all build start",
         "dev": "nodemon",
-        "start:prod": "NODE_ENV=production npm-run-all build start",
+        "start:prod": "npm-run-all build start",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {

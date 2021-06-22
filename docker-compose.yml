@@ -7,6 +7,10 @@ services:
             context: .
             dockerfile: Dockerfile
         image: blackparadise0407/hotel_manage_server
+        env_file:
+            - .prod.env
+        environment:
+            - NODE_ENV=production
         ports:
             - '8008:8008'
     mongo:

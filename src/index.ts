@@ -10,7 +10,8 @@ import morgan from 'morgan';
 
 if (process.env.NODE_ENV === 'development') {
     dotenv.config({ path: '.env' });
-} else dotenv.config({ path: '.prod.env' });
+}
+// else dotenv.config({ path: '.prod.env' });
 
 import App from '@app/modules/app/App';
 import AttachmentController from '@app/modules/attachment/AttachmentController';
