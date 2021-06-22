@@ -1,6 +1,12 @@
 version: '3'
 
 services:
+    mongo:
+        image: mongo
+        ports:
+            - 27017:27018
+        volumes:
+            - mongodb:/data/db
     hotel_manage_server:
         restart: always
         build:
@@ -13,11 +19,5 @@ services:
             - NODE_ENV=production
         ports:
             - '8008:8008'
-    mongo:
-        image: mongo
-        ports:
-            - 27017:27018
-        volumes:
-            - mongodb:/data/db
 volumes:
     mongodb:
