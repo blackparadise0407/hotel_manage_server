@@ -171,14 +171,30 @@ class RoomController extends AbstractController {
 
     protected async update({ user, body, params }: Request, res: Response) {
         hasRole(user, ['manager']);
-        const { number: roomNumber, floor } = body;
+        let { number: roomNumber, floor } = body;
+        roomNumber = parseInt(roomNumber, 10);
+        floor = parseInt(floor, 10);
+
+        if (roomNumber > ROOM.MAX_ROOM) {
+            throw new AdvancedError({
+                message: 'Room number cannot exceed ' + ROOM.MAX_ROOM,
+                type: 'invalid',
+            });
+        }
+
+        if (floor > ROOM.MAX_FLOOR) {
+            throw new AdvancedError({
+                message: 'Floor cannot exceed ' + ROOM.MAX_FLOOR,
+                type: 'invalid',
+            });
+        }
 
         const existedRooms = (await Room.find()) as IRoom[];
         if (
-            some(
-                existedRooms,
-                (r) => r.number === roomNumber && r.floor === floor,
-            )
+            some(existedRooms, {
+                number: roomNumber,
+                floor,
+            })
         ) {
             throw new AdvancedError({
                 message: 'Room already exists',
