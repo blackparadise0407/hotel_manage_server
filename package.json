@@ -11,6 +11,7 @@
         "lint": "tslint -c tslint.json -p tsconfig.json --fix",
         "tsc": "tsc",
         "build": "npm-run-all clean copyAssets lint tsc",
+        "build:prod": "NODE_ENV=production npm-run-all clean copyAssets lint tsc",
         "start": "node .",
         "start:dev": "NODE_ENV=development npm-run-all build start",
         "dev": "nodemon",
