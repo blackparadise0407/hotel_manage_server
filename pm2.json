@@ -1,0 +1,9 @@
+{
+    "apps": [
+        {
+            "name": "hotel_manage_server",
+            "script": "npm",
+            "args": "start:prod"
+        }
+    ]
+}
